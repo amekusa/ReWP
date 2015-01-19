@@ -10,3 +10,4 @@ provision/*
 !provision/packaging.sh
 package.box
 .idea/
+.project

@@ -8,8 +8,9 @@ Vagrant.require_version ">= 1.5"
 # Configuration for the WordPress
 #
 
-VM_BOX               = ENV["wp_box"] || "miya0001/vccw" # pre-installed box
-# VM_BOX               = ENV["wp_box"] || "chef/centos-6.5-i386"
+VM_BOX               = "miya0001/vccw" # pre-installed box
+
+DOCUMENT_ROOT        = "/var/www/wordpress" # path to your site's document-root (relative from Vagrantfile)
 
 WP_VERSION           = ENV["wp_version"] || 'latest' # latest or 3.4 or later or http(s):// URL to zipfile
 WP_LANG              = ENV["wp_lang"] || "en_US" # WordPress locale (e.g. ja)
@@ -17,8 +18,8 @@ WP_LANG              = ENV["wp_lang"] || "en_US" # WordPress locale (e.g. ja)
 WP_HOSTNAME          = "wordpress.local" # e.g example.com
 WP_IP                = "192.168.33.10" # host ip address
 
-WP_HOME              = "" # path to WordPress directory, e.g blank or sub-directory name like "wp".
-WP_SITEURL           = "" # path to sitehome, e.g blank or "/wp" or ...
+WP_HOME              = "" # path to WP_HOME, e.g blank or /wp or ...
+WP_SITEURL           = "" # path to WP_SITEURL, e.g or /wp or ...
 
 WP_TITLE             = "Welcome to the Vagrant" # title
 WP_ADMIN_USER        = "admin" # default user
@@ -32,14 +33,12 @@ WP_DB_PASS           = 'wordpress'
 
 WP_DB_ROOT_PASS      = 'wordpress'
 
-WP_DEFAULT_PLUGINS   = %w(theme-check plugin-check dynamic-hostname) # default plugins
+WP_DEFAULT_PLUGINS   = %w(theme-check debug-bar dynamic-hostname)
 WP_DEFAULT_THEME     = ENV["wp_theme"] || '' # e.g. twentyfifteen
-WP_OPTIONS           = {
-    # blogname: "This is the long blog name for the theme review",
-    # blogdescription: "This is a very very long tagline to reviewed in theme review proccess. Yeah!"
-}
+WP_OPTIONS           = {}
 WP_REWRITE_STRUCTURE = '/archives/%post_id%'
 
+WP_DIR               = '' # e.g. /wp or wp or other
 WP_IS_MULTISITE      = false # enable multisite when true
 WP_FORCE_SSL_ADMIN   = false # enable force ssl admin when true
 WP_DEBUG             = true # enable debug mode
@@ -48,7 +47,7 @@ WP_THEME_UNIT_TEST   = false # automatic import theme unit test data
 
 WP_ALWAYS_RESET      = true # always reset database
 
-WP_CHEF_COOKBOOKS_PATH = File.dirname(__FILE__) # path to the cookbooks (e.g. ~/vccw)
+WP_CHEF_COOKBOOKS_PATH = File.join(File.dirname(__FILE__), 'provision') # path to the cookbooks (e.g. ~/vccw)
 
 if WP_LANG === 'ja' then
   WP_THEME_UNIT_TEST_DATA_URI = 'https://raw.githubusercontent.com/jawordpressorg/theme-test-data-ja/master/wordpress-theme-test-date-ja.xml'
@@ -58,16 +57,15 @@ end
 
 # end configuration
 
-
 Vagrant.configure(2) do |config|
 
   config.vm.box = VM_BOX
-  config.ssh.forward_agent = true
+  #config.ssh.forward_agent = true
 
   config.vm.hostname = WP_HOSTNAME
   config.vm.network :private_network, ip: WP_IP
 
-  config.vm.synced_folder "www/wordpress/", "/var/www/wordpress", :create => "true"
+  config.vm.synced_folder "www/wordpress/", DOCUMENT_ROOT, :create => "true"
 
   if Vagrant.has_plugin?("vagrant-hostsupdater")
     config.hostsupdater.remove_on_suspend = true
@@ -81,15 +79,6 @@ Vagrant.configure(2) do |config|
     ]
   end
 
-  if "miya0001/vccw" != VM_BOX && 'provision' != ARGV[0]
-    config.vm.provision "shell",
-        inline: "curl -L https://www.opscode.com/chef/install.sh | sudo bash -s -- -v 11"
-  end
-
-  if File.exists?(File.join(File.expand_path(File.dirname(__FILE__)), 'provision', 'provision-pre.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-pre.sh" )
-  end
-
   config.vm.provision :chef_solo do |chef|
 
     chef.cookbooks_path = [
@@ -99,7 +88,7 @@ Vagrant.configure(2) do |config|
 
     chef.json = {
       :apache => {
-        :docroot_dir  => '/var/www/wordpress',
+        :docroot_dir  => File.join("/var", DOCUMENT_ROOT),
         :user         => 'vagrant',
         :group        => 'vagrant',
         :listen_ports => ["80", "443"]
@@ -126,6 +115,7 @@ Vagrant.configure(2) do |config|
         :wp_host           => WP_HOSTNAME,
         :wp_home           => WP_HOME,
         :wp_siteurl        => WP_SITEURL,
+        :wp_docroot        => DOCUMENT_ROOT,
         :locale            => WP_LANG,
         :admin_user        => WP_ADMIN_USER,
         :admin_password    => WP_ADMIN_PASS,
@@ -138,6 +128,7 @@ Vagrant.configure(2) do |config|
         :savequeries       => WP_SAVEQUERIES,
         :theme_unit_test   => WP_THEME_UNIT_TEST,
         :theme_unit_test_data_url => WP_THEME_UNIT_TEST_DATA_URI,
+        :gitignore         => File.join(DOCUMENT_ROOT, ".gitignore"),
         :always_reset      => WP_ALWAYS_RESET,
         :dbhost            => WP_DB_HOST,
         :dbname            => WP_DB_NAME,
@@ -150,8 +141,8 @@ Vagrant.configure(2) do |config|
       :vccw => {
         :wordmove => {
           :movefile        => File.join('/vagrant', "Movefile"),
-          :url             => "http://" << File.join(WP_HOSTNAME, WP_HOME),
-          :wpdir           => File.join('www/wordpress', WP_SITEURL),
+          :url             => "http://" << File.join(WP_HOSTNAME, WP_DIR),
+          :wpdir           => File.join(DOCUMENT_ROOT, WP_DIR),
           :dbhost          => WP_DB_HOST,
           :dbname          => WP_DB_NAME,
           :dbuser          => WP_DB_USER,
@@ -192,18 +183,6 @@ Vagrant.configure(2) do |config|
     chef.add_recipe "wpcli::install"
     chef.add_recipe "vccw"
 
-  end
-
-  if File.exists?(File.join(File.expand_path(File.dirname(__FILE__)), 'provision', 'provision-post.sh')) then
-    config.vm.provision :shell, :path => File.join( "provision", "provision-post.sh" )
-  end
-
-  if Vagrant.has_plugin?("vagrant-serverspec")
-    if ENV["VAGRANT_VAGRANTFILE"] === 'Vagrantfile.sample' then
-      config.vm.provision :serverspec do |spec|
-        spec.pattern = 'spec/default/*_spec.rb'
-      end
-    end
   end
 
 end

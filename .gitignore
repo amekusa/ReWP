@@ -1,13 +1,12 @@
 .vagrant
 www
-Vagrantfile
 Movefile
 _site
 .DS_Store
 Movefile
 provision/*
-!provision/.gitkeep
-!provision/packaging.sh
+!provision/cookbooks
+!provision/site-cookbooks
 package.box
 .idea/
 .project

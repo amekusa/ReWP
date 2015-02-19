@@ -128,6 +128,10 @@ Vagrant.configure(2) do |config|
         :always_reset      => _conf['reset_db'],
         :dbhost            => _conf['db_host'],
         :dbprefix          => _conf['db_prefix'],
+        :dbname            => _conf['db_name'],
+        :dbuser            => _conf['db_user'],
+        :dbpassword        => _conf['db_pass'],
+        :import_db         => _conf['import_db'],
         :options           => _conf['options'],
         :rewrite_structure => _conf['rewrite_structure']
       },

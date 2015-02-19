@@ -1,7 +1,7 @@
 # encoding: utf-8
 # vim: ft=ruby expandtab shiftwidth=2 tabstop=2
 
-packages = %w{git subversion zip unzip kernel-devel gcc perl make}
+packages = %w{git subversion zip unzip kernel-devel gcc perl make jq}
 
 packages.each do |pkg|
   package pkg do
@@ -10,7 +10,7 @@ packages.each do |pkg|
 end
 
 git node[:wpcli][:dir] do
-  repository "git://github.com/wp-cli/builds.git"
+  repository "https://github.com/wp-cli/builds.git"
   action :sync
 end
 
@@ -37,14 +37,17 @@ directory '/home/vagrant/.wp-cli/commands' do
 end
 
 template '/home/vagrant/.wp-cli/config.yml' do
-  source "config.yml"
+  source "config.yml.erb"
   owner node[:wpcli][:user]
   group node[:wpcli][:group]
   mode "0644"
+  variables(
+    :docroot => File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+  )
 end
 
 git 'home/vagrant/.wp-cli/commands/dictator' do
-  repository "git://github.com/danielbachhuber/dictator.git"
+  repository "https://github.com/danielbachhuber/dictator.git"
   user node[:wpcli][:user]
   group node[:wpcli][:group]
   action :sync

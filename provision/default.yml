@@ -11,6 +11,7 @@ chef_cookbook_path: ./provision
 # Network Settings
 #
 hostname: wordpress.local
+hostname_old: wordpress.old.local
 ip: 192.168.33.10
 sync_folder: 'www/wordpress'
 
@@ -84,3 +85,15 @@ theme_unit_test_uri: https://wpcom-themes.svn.automattic.com/demo/theme-unit-tes
 # DB will be reset when provision
 #
 reset_db_on_provision: true
+
+#
+# DB import
+#
+import_db: false
+import_db_file: db.sql
+
+#
+# WXR import
+#
+import_wxr: false
+import_wxr_file: db.xml

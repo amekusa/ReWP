@@ -177,20 +177,30 @@ if node[:wpcli][:default_theme] != '' then
 end
 
 
-if node[:wpcli][:import_db] or node[:wpcli][:theme_unit_test] then
-  bash "Wordpress Importer install" do
+if node[:wpcli][:import_db] then
+  bash "Import DB" do
+    user node[:wpcli][:user]
+    group node[:wpcli][:group]
+    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp db import #{Shellwords.shellescape(node[:wpcli][:import_db_file])}"
+  end
+end
+
+
+if node[:wpcli][:import_wxr] or node[:wpcli][:theme_unit_test] then
+  bash "wordpress-importer install" do
     user node[:wpcli][:user]
     group node[:wpcli][:group]
     cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
     code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp plugin install wordpress-importer --activate"
   end
 
-  if node[:wpcli][:import_db] then
-    bash "Import DB" do
+  if node[:wpcli][:import_wxr] then
+    bash "Import WXR" do
       user node[:wpcli][:user]
       group node[:wpcli][:group]
       cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:import_db_file])}"
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:import_wxr_file])}"
     end
   end
 
@@ -285,5 +295,16 @@ bash "create-ssl-keys" do
   EOH
   notifies :restart, "service[apache2]"
 end
+
+
+if node[:wpcli][:import_db] or node[:wpcli][:import_wxr] then
+  bash "Search/replace URLs in the DB" do
+    user node[:wpcli][:user]
+    group node[:wpcli][:group]
+    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp search-replace --network #{Shellwords.shellescape(node[:wpcli][:wp_host_old])} #{Shellwords.shellescape(node[:wpcli][:wp_host])}"
+  end
+end
+
 
 iptables_rule "wordpress-iptables"

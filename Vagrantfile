@@ -133,6 +133,9 @@ Vagrant.configure(2) do |config|
         :dbpassword        => _conf['db_pass'],
         :import_db         => _conf['import_db'],
         :import_db_file    => _conf['import_db_file'],
+        :import_wxr        => _conf['import_wxr'],
+        :import_wxr_file   => _conf['import_wxr_file'],
+        :wp_host_old       => _conf['hostname_old'],
         :options           => _conf['options'],
         :rewrite_structure => _conf['rewrite_structure']
       },

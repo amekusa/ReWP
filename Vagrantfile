@@ -132,6 +132,7 @@ Vagrant.configure(2) do |config|
         :dbuser            => _conf['db_user'],
         :dbpassword        => _conf['db_pass'],
         :import_db         => _conf['import_db'],
+        :import_db_file    => _conf['import_db_file'],
         :options           => _conf['options'],
         :rewrite_structure => _conf['rewrite_structure']
       },

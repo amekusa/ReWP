@@ -45,28 +45,30 @@ directory File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home]) do
 end
 
 
-bash "wordpress-core-download" do
-  user node[:wpcli][:user]
-  group node[:wpcli][:group]
-  if node[:wpcli][:wp_version] == 'latest' then
-      code <<-EOH
-WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp core download \\
---path=#{File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])} \\
---locale=#{Shellwords.shellescape(node[:wpcli][:locale])} \\
---force
-      EOH
-  elsif node[:wpcli][:wp_version] =~ %r{^http(s)?://.*?\.zip$}
-      code <<-EOH
-        cd /tmp && wget -O ./download.zip #{Shellwords.shellescape(node[:wpcli][:wp_version])} && unzip -d /var/www/ ./download.zip && rm ./download.zip
-      EOH
-  else
-      code <<-EOH
-WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp core download \\
---path=#{File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])} \\
---locale=#{Shellwords.shellescape(node[:wpcli][:locale])} \\
---version=#{Shellwords.shellescape(node[:wpcli][:wp_version])} \\
---force
-      EOH
+unless File.exist?(File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home], 'index.php'))
+  bash "wordpress-core-download" do
+    user node[:wpcli][:user]
+    group node[:wpcli][:group]
+    if node[:wpcli][:wp_version] == 'latest' then
+        code <<-EOH
+  WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp core download \\
+  --path=#{File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])} \\
+  --locale=#{Shellwords.shellescape(node[:wpcli][:locale])} \\
+  --force
+        EOH
+    elsif node[:wpcli][:wp_version] =~ %r{^http(s)?://.*?\.zip$}
+        code <<-EOH
+          cd /tmp && wget -O ./download.zip #{Shellwords.shellescape(node[:wpcli][:wp_version])} && unzip -d /var/www/ ./download.zip && rm ./download.zip
+        EOH
+    else
+        code <<-EOH
+  WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp core download \\
+  --path=#{File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])} \\
+  --locale=#{Shellwords.shellescape(node[:wpcli][:locale])} \\
+  --version=#{Shellwords.shellescape(node[:wpcli][:wp_version])} \\
+  --force
+        EOH
+    end
   end
 end
 
@@ -175,25 +177,35 @@ if node[:wpcli][:default_theme] != '' then
 end
 
 
-if node[:wpcli][:theme_unit_test] == true then
-  remote_file node[:wpcli][:theme_unit_test_data] do
-    source node[:wpcli][:theme_unit_test_data_url]
-    mode 0644
-    action :create
-  end
-
-  bash "Import theme unit test data" do
+if node[:wpcli][:import_db] or node[:wpcli][:theme_unit_test] then
+  bash "Wordpress Importer install" do
     user node[:wpcli][:user]
     group node[:wpcli][:group]
     cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
     code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp plugin install wordpress-importer --activate"
   end
 
-  bash "Import theme unit test data" do
-    user node[:wpcli][:user]
-    group node[:wpcli][:group]
-    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:theme_unit_test_data])}"
+  if node[:wpcli][:import_db] then
+    bash "Import DB" do
+      user node[:wpcli][:user]
+      group node[:wpcli][:group]
+      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:import_db_file])}"
+    end
+  end
+
+  if node[:wpcli][:theme_unit_test] then
+    remote_file node[:wpcli][:theme_unit_test_data] do
+      source node[:wpcli][:theme_unit_test_data_url]
+      mode 0644
+      action :create
+    end
+    bash "Import theme unit test data" do
+      user node[:wpcli][:user]
+      group node[:wpcli][:group]
+      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:theme_unit_test_data])}"
+    end
   end
 end
 

@@ -89,8 +89,8 @@ reset_db_on_provision: true
 #
 # DB import
 #
-import_db: false
-import_db_file: db.sql
+import_sql: false
+import_sql_file: db.sql
 
 #
 # WXR import

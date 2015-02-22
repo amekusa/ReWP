@@ -181,18 +181,22 @@ if node[:wpcli][:default_theme] != '' then
 end
 
 
-if node[:wpcli][:import_db] then
-  bash "Import DB" do
-    user node[:wpcli][:user]
-    group node[:wpcli][:group]
-    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp db import #{Shellwords.shellescape(node[:wpcli][:import_db_file])}"
+if node[:wpcli][:import_sql] then
+  unless File.exist?(File.join('/vagrant', node[:wpcli][:import_sql_file]))
+    Chef::Log.warn("SQL file to import is not found")
+  else
+    bash "Import SQL" do
+      user node[:wpcli][:user]
+      group node[:wpcli][:group]
+      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp db import #{Shellwords.shellescape(File.join('/vagrant', node[:wpcli][:import_sql_file]))}"
+    end
   end
 end
 
 
 if node[:wpcli][:import_wxr] or node[:wpcli][:theme_unit_test] then
-  bash "wordpress-importer install" do
+  bash "WordPress wordpress-importer install" do
     user node[:wpcli][:user]
     group node[:wpcli][:group]
     cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
@@ -200,11 +204,15 @@ if node[:wpcli][:import_wxr] or node[:wpcli][:theme_unit_test] then
   end
 
   if node[:wpcli][:import_wxr] then
-    bash "Import WXR" do
-      user node[:wpcli][:user]
-      group node[:wpcli][:group]
-      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(node[:wpcli][:import_wxr_file])}"
+    unless File.exist?(File.join('/vagrant', node[:wpcli][:import_wxr_file]))
+      Chef::Log.warn("WXR file to import is not found")
+    else
+      bash "Import WXR" do
+        user node[:wpcli][:user]
+        group node[:wpcli][:group]
+        cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+        code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp import --authors=create #{Shellwords.shellescape(File.join('/vagrant', node[:wpcli][:import_wxr_file]))}"
+      end
     end
   end
 
@@ -267,6 +275,17 @@ if node[:wpcli][:is_multisite] == true then
   end
 end
 
+
+if node[:wpcli][:import_sql] or node[:wpcli][:import_wxr] then
+  bash "Search/replace hostnames in the DB" do
+    user node[:wpcli][:user]
+    group node[:wpcli][:group]
+    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp search-replace #{if node[:wpcli][:is_multisite] then '--network ' end}#{Shellwords.shellescape(node[:wpcli][:wp_host_old])} #{Shellwords.shellescape(node[:wpcli][:wp_host])}"
+  end
+end
+
+
 template File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home], '.gitignore') do
   source "gitignore.erb"
   owner node[:wpcli][:user]
@@ -299,16 +318,5 @@ bash "create-ssl-keys" do
   EOH
   notifies :restart, "service[apache2]"
 end
-
-
-if node[:wpcli][:import_db] or node[:wpcli][:import_wxr] then
-  bash "Search/replace URLs in the DB" do
-    user node[:wpcli][:user]
-    group node[:wpcli][:group]
-    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp search-replace --network #{Shellwords.shellescape(node[:wpcli][:wp_host_old])} #{Shellwords.shellescape(node[:wpcli][:wp_host])}"
-  end
-end
-
 
 iptables_rule "wordpress-iptables"

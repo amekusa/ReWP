@@ -1,11 +1,32 @@
-# [WPPull](https://github.com/amekusa/WPPull)
-Easy to clone your WordPress site into local  
-And share it with your team!
+# [ReWP](https://github.com/amekusa/ReWP)
+*Clone your WordPress site into local  
+and share it with your team.*
 
-## Setting up a local dev. environment for an existing WP site is not easy
+This is a fork of [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw).
+
+## It’s not easy to set up a local development environment for an existing WP site
 That's why I made this!
 
 ## How to use
+1. Clone or download [ReWP](https://github.com/amekusa/ReWP) into local
+2. Rename the folder as you like. Your site’s name is better
+3. Copy the **document root** folder of your WP site into ReWP
+4. Export database of your WP site into a file (SQL or XML) and place it into ReWP
+5. Copy `ReWP/provision/default.yml` as `ReWP/site.yml`
+6. Edit the `site.yml` to be suited for your site’s specifications
+    + `hostname` is the **local version** of your site’s URL.  
+    `hostname_old` is the production one
+    + `sync_folder` is a relative path to the document root from ReWP
+    + `import_sql` must be **true** to import a SQL file
+    + `import_wxr` must be **true** to import a XML file
+7. ```sh
+cd /path/to/your/ReWP
+vagrant up
+```
+8. Wait for sevral minutes. You’ll see lots of console outputs
+9. If no error, **you’ve done!** Browse the address you specified as `hostname` in the `site.yml`
 
+## Need help?
+Post your problem in https://github.com/amekusa/ReWP/issues
 
-This is a fork of [VCCW (vagrant-chef-wordpress)](https://github.com/miya0001/vccw).
+Thx :)

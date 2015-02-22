@@ -19,10 +19,9 @@ That's why I made this!
     + `sync_folder` is a relative path to the document root from ReWP
     + `import_sql` must be **true** to import a SQL file
     + `import_wxr` must be **true** to import a XML file
-7. ```sh
-cd /path/to/your/ReWP
-vagrant up
-```
+7. In the shell, type commands as follows:
+        cd /path/to/your/ReWP
+        vagrant up
 8. Wait for sevral minutes. You’ll see lots of console outputs
 9. If no error, **you’ve done!** Browse the address you specified as `hostname` in the `site.yml`
 

@@ -1,9 +1,9 @@
-[:jp: ja](README.ja.md)  
-
 # [ReWP](https://github.com/amekusa/ReWP)
 A smart way to rebuild your WordPress site into local.  
 
 \* This is a fork of [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw).
+
+➥ [日本語](README.ja.md)  
 
 ---
 

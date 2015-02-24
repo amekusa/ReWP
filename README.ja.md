@@ -1,0 +1,31 @@
+# [ReWP](https://github.com/amekusa/ReWP) <small>リワードプレス</small>
+あなたの WordPress サイトをローカルに再構築するスマートな方法
+
+\* これは [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw) のフォークです。
+
+## 既存の WP サイトのローカル開発環境をセットアップするのは簡単ではない
+だからこれを作りました！
+
+## 使い方
+1. ローカルに [ReWP](https://github.com/amekusa/ReWP) をクローンあるいはダウンロード
+2. ReWP フォルダを好きにリネームする。あなたのサイト名にするのが良い
+3. あなたのサイトの**ドキュメントルート**フォルダを ReWP フォルダ以下にコピー
+4. あなたのサイトのデータベースを一つのファイル (SQL or XML) にエクスポートし、それを ReWP フォルダ内に `db.sql` または `db.xml` として配置
+5. `ReWP/provision/default.yml` を `ReWP/site.yml` としてコピー
+6. `site.yml` をサイトの仕様に沿うよう編集
+    + `hostname` はサイトの**ローカル版**の URL  
+    `hostname_old` は本番の URL
+    + `sync_folder` は ReWP フォルダを基準とした、サイトのドキュメントルートへのパス
+    + `import_sql` は **true** だと SQL インポートが有効
+    + `import_wxr` は **true** だと XML インポートが有効
+7. シェルで以下のコマンドをタイプ:
+
+        cd /path/to/your/ReWP
+        vagrant up
+8. 数分間待つ。
+9. エラーが無ければ**成功!** `site.yml` で `hostname` として設定したアドレスをブラウザで確認してください
+
+## Need help?
+問題は遠慮なくここ <https://github.com/amekusa/ReWP/issues> にポストしてください。
+
+Thx :)

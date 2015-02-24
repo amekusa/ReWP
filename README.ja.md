@@ -1,7 +1,11 @@
 # [ReWP](https://github.com/amekusa/ReWP) <small>リワードプレス</small>
-あなたの WordPress サイトをローカルに再構築するスマートな方法
+スマートに、あなたの WordPress サイトをローカルに再構築
 
 \* これは [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw) のフォークです。
+
+➥ [English](README.md) 
+
+---
 
 ## 既存の WP サイトのローカル開発環境をセットアップするのは簡単ではない
 だからこれを作りました！
@@ -24,6 +28,8 @@
         vagrant up
 8. 数分間待つ。
 9. エラーが無ければ**成功!** `site.yml` で `hostname` として設定したアドレスをブラウザで確認してください
+
+---
 
 ## Need help?
 問題は遠慮なくここ <https://github.com/amekusa/ReWP/issues> にポストしてください。

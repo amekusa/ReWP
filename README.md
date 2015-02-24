@@ -1,7 +1,11 @@
+[:jp: ja](README.ja.md)  
+
 # [ReWP](https://github.com/amekusa/ReWP)
 A smart way to rebuild your WordPress site into local.  
 
 \* This is a fork of [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw).
+
+---
 
 ## It’s not easy to set up a local development environment for an existing WP site
 That's why I made this!
@@ -24,6 +28,8 @@ That's why I made this!
         vagrant up
 8. Wait for several minutes. You’ll see lots of console outputs
 9. If no error, **you’ve done!** Browse the address you specified as `hostname` in the `site.yml`
+
+---
 
 ## Need help?
 Do not hesitate to post your problem in <https://github.com/amekusa/ReWP/issues>.

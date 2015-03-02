@@ -97,3 +97,6 @@ import_sql_file: db.sql
 #
 import_wxr: false
 import_wxr_file: db.xml
+
+# Misc.
+overwrite_htaccess: false

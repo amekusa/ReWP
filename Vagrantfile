@@ -137,7 +137,8 @@ Vagrant.configure(2) do |config|
         :dbuser            => _conf['db_user'],
         :dbpassword        => _conf['db_pass'],
         :options           => _conf['options'],
-        :rewrite_structure => _conf['rewrite_structure']
+        :rewrite_structure => _conf['rewrite_structure'],
+        :overwrite_htaccess => _conf['overwrite_htaccess']
       },
       :vccw => {
         :wordmove => {

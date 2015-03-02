@@ -272,6 +272,7 @@ if node[:wpcli][:is_multisite] == true then
     owner node[:wpcli][:user]
     group node[:wpcli][:group]
     mode "0644"
+    action node[:wpcli][:overwrite_htaccess] ? :create : :create_if_missing
   end
 end
 

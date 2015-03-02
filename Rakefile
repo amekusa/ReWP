@@ -22,3 +22,10 @@ namespace :spec do
     end
   end
 end
+
+directory "./dist"
+task :dist, [:commit_id, :format] => "./dist" do |t, args|
+  prefix = "rewp"
+  filename = "dist/#{prefix}-#{args[:commit_id]}.#{args[:format]}"
+  sh "git archive --format=#{args[:format]} --worktree-attributes #{args[:commit_id]} -o #{filename}"
+end

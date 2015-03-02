@@ -1,0 +1,8 @@
+# Force provisioning script to use LF, even on Windows
+* text eol=lf
+
+# Excludes from git-archive
+.rspec export-ignore
+Gemfile export-ignore
+Gemfile.lock export-ignore
+Rakefile export-ignore

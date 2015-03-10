@@ -3,7 +3,7 @@
 
 \* これは [VCCW (vagrant-chef-wordpress)](https://github.com/vccw-team/vccw) のフォークです。
 
-➥ [English](README.md) 
+➥ [English](README.md)
 
 ---
 
@@ -28,6 +28,11 @@
         vagrant up
 8. 数分間待つ。
 9. エラーが無ければ**成功!** `site.yml` で `hostname` として設定したアドレスをブラウザで確認してください
+
+## 動作条件
++ [WordPress](https://wordpress.org/) 3.5.2+ **[MUST]**
++ [VirtualBox](https://www.virtualbox.org/) 4.3+
++ [Vagrant](https://www.vagrantup.com/) 1.7.1+
 
 ---
 

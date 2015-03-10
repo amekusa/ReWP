@@ -29,6 +29,11 @@ That's why I made this!
 8. Wait for several minutes. You’ll see lots of console outputs
 9. If no error, **you’ve done!** Browse the address you specified as `hostname` in the `site.yml`
 
+## Requirements
++ [WordPress](https://wordpress.org/) 3.5.2+ **[MUST]**
++ [VirtualBox](https://www.virtualbox.org/) 4.3+
++ [Vagrant](https://www.vagrantup.com/) 1.7.1+
+
 ---
 
 ## Need help?

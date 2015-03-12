@@ -14,6 +14,7 @@ hostname: wordpress.local
 hostname_old: wordpress.old.local
 ip: 192.168.33.10
 sync_folder: 'www/wordpress'
+sync_folder_guest: '/var/www/wordpress'
 
 #
 # WordPress Settings
@@ -27,7 +28,7 @@ rewrite_structure: /archives/%post_id%
 #
 # WordPress Path
 #
-document_root: '/var/www/wordpress'
+document_root: ''
 wp_home: ''     # Path to the WP_HOME like "wp"
 wp_siteurl: ''  # Path to the WP_SITEURL like "wp"
 

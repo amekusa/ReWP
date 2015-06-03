@@ -38,6 +38,12 @@ describe command("wp user get #{Shellwords.shellescape(_conf['admin_user'])} --f
   its(:stdout){ should eq 'administrator' + "\n" }
 end
 
+describe command("wp user get #{Shellwords.shellescape(_conf['admin_user'])} --format=json | jq -r .user_email") do
+  let(:disable_sudo) { true }
+  its(:exit_status) { should eq 0 }
+  its(:stdout){ should eq _conf['admin_email'] + "\n" }
+end
+
 describe command("wp eval 'echo get_locale();'") do
   let(:disable_sudo) { true }
   its(:exit_status) { should eq 0 }
@@ -48,12 +54,6 @@ describe command("wp eval \"bloginfo('name');\"") do
   let(:disable_sudo) { true }
   its(:exit_status) { should eq 0 }
   its(:stdout){ should eq _conf['title'] }
-end
-
-describe command("wp option get permalink_structure") do
-  let(:disable_sudo) { true }
-  its(:exit_status) { should eq 0 }
-  its(:stdout){ should eq _conf['rewrite_structure'] + "\n" }
 end
 
 _conf['plugins'].each do |plugin|
@@ -75,5 +75,27 @@ _conf['options'].each do |key, value|
     let(:disable_sudo) { true }
     its(:exit_status) { should eq 0 }
     its(:stdout){ should eq value.to_s + "\n" }
+  end
+end
+
+#
+# Multi site
+#
+if true == _conf['multisite']
+  describe command("wp eval 'echo WP_ALLOW_MULTISITE;'") do
+    let(:disable_sudo) { true }
+    its(:exit_status) { should eq 0 }
+    its(:stdout){ should eq '1' }
+  end
+  describe command("wp option get permalink_structure") do
+    let(:disable_sudo) { true }
+    its(:exit_status) { should eq 0 }
+    its(:stdout){ should eq '/blog/%year%/%monthnum%/%day%/%postname%/' + "\n" }
+  end
+else
+  describe command("wp option get permalink_structure") do
+    let(:disable_sudo) { true }
+    its(:exit_status) { should eq 0 }
+    its(:stdout){ should eq _conf['rewrite_structure'] + "\n" }
   end
 end

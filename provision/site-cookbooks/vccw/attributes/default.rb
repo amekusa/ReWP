@@ -9,8 +9,6 @@ default[:vccw][:iemoto_repositry]      = 'https://github.com/megumiteam/iemoto.g
 default[:vccw][:phpunit][:src]         = 'https://phar.phpunit.de/phpunit.phar'
 default[:vccw][:phpunit][:link]        = '/usr/local/bin/phpunit'
 default[:vccw][:phpunit][:wp_test_install] = '/usr/bin/wp-test-install'
-default[:vccw][:phpunit][:mysql_name]  = 'wp-test'
-default[:vccw][:phpunit][:wp_version]  = 'latest'
 
 default[:vccw][:composer][:install]    = 'curl -sS https://getcomposer.org/installer | php'
 default[:vccw][:composer][:link]       = '/usr/local/bin/composer'
@@ -27,3 +25,6 @@ default[:vccw][:wordmove][:dbhost]     = 'localhost'
 default[:vccw][:wordmove][:dbname]     = 'wordpress'
 default[:vccw][:wordmove][:dbuser]     = 'wordpress'
 default[:vccw][:wordmove][:dbpassword] = 'wordpress'
+
+default[:vccw][:user] = 'vagrant'
+default[:vccw][:group] = 'vagrant'

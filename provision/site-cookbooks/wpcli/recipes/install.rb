@@ -3,7 +3,23 @@
 
 require 'shellwords'
 
-# node.set_unless[:wpcli][:dbpassword] = secure_password
+include_recipe 'apache2'
+include_recipe 'apache2::mod_php5'
+include_recipe 'apache2::mod_ssl'
+include_recipe 'mysql::server'
+include_recipe 'mysql::ruby'
+
+service "iptables" do
+  supports :status => true, :restart => true
+  action [:enable, :start]
+end
+
+template "/etc/sysconfig/iptables" do
+  source "wordpress-iptables.erb"
+  owner "root"
+  group "root"
+  mode "0600"
+end
 
 execute "mysql-install-wp-privileges" do
   command "/usr/bin/mysql -u root -p\"#{node[:mysql][:server_root_password]}\" < #{node[:mysql][:conf_dir]}/wp-grants.sql"
@@ -98,10 +114,6 @@ define( 'JETPACK_DEV_DEBUG', #{node[:wpcli][:debug_mode]} );
 define( 'WP_DEBUG', #{node[:wpcli][:debug_mode]} );
 define( 'FORCE_SSL_ADMIN', #{node[:wpcli][:force_ssl_admin]} );
 define( 'SAVEQUERIES', #{node[:wpcli][:savequeries]} );
-#{if node[:wpcli][:is_multisite] == true then <<MULTISITE
-define( 'WP_ALLOW_MULTISITE', true );
-MULTISITE
-end}
 PHP
   EOH
 end
@@ -319,5 +331,3 @@ bash "create-ssl-keys" do
   EOH
   notifies :restart, "service[apache2]"
 end
-
-iptables_rule "wordpress-iptables"

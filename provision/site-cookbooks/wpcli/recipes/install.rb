@@ -193,20 +193,6 @@ if node[:wpcli][:default_theme] != '' then
 end
 
 
-if node[:wpcli][:import_sql] then
-  unless File.exist?(File.join('/vagrant', node[:wpcli][:import_sql_file]))
-    Chef::Log.warn("SQL file to import is not found")
-  else
-    bash "Import SQL" do
-      user node[:wpcli][:user]
-      group node[:wpcli][:group]
-      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp db import #{Shellwords.shellescape(File.join('/vagrant', node[:wpcli][:import_sql_file]))}"
-    end
-  end
-end
-
-
 if node[:wpcli][:import_wxr] or node[:wpcli][:theme_unit_test] then
   bash "WordPress wordpress-importer install" do
     user node[:wpcli][:user]
@@ -289,12 +275,33 @@ if node[:wpcli][:is_multisite] == true then
 end
 
 
+if node[:wpcli][:import_sql] then
+  unless File.exist?(File.join('/vagrant', node[:wpcli][:import_sql_file]))
+    Chef::Log.warn("SQL file to import is not found")
+  else
+    bash "Import SQL" do
+      user node[:wpcli][:user]
+      group node[:wpcli][:group]
+      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp db import #{Shellwords.shellescape(File.join('/vagrant', node[:wpcli][:import_sql_file]))}"
+    end
+  end
+end
+
+
 if node[:wpcli][:import_sql] or node[:wpcli][:import_wxr] then
-  bash "Search/replace hostnames in the DB" do
+  bash "Install DB search and replace tool" do
     user node[:wpcli][:user]
     group node[:wpcli][:group]
-    cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
-    code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp search-replace #{if node[:wpcli][:is_multisite] then '--network ' end}#{Shellwords.shellescape(node[:wpcli][:wp_host_old])} #{Shellwords.shellescape(node[:wpcli][:wp_host])}"
+    cwd "/vagrant"
+    code "composer install"
+  end
+
+  bash "Search and replace hostnames in the DB" do
+    user node[:wpcli][:user]
+    group node[:wpcli][:group]
+    cwd "/vagrant"
+    code "php vendor/interconnectit/search-replace-db/srdb.cli.php -h #{Shellwords.shellescape(node[:wpcli][:dbhost])} -n #{Shellwords.shellescape(node[:wpcli][:dbname])} -u #{Shellwords.shellescape(node[:wpcli][:dbuser])} -p #{Shellwords.shellescape(node[:wpcli][:dbpassword])} -s #{Shellwords.shellescape(node[:wpcli][:wp_host_old])} -r #{Shellwords.shellescape(node[:wpcli][:wp_host])}"
   end
 end
 

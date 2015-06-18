@@ -14,5 +14,8 @@
 	"license" : "MIT",
 	"minimum-stability" : "stable",
 	"description" : "A smart way to rebuild you WordPress site into local",
-	"homepage" : "https://github.com/amekusa/ReWP"
+	"homepage" : "https://github.com/amekusa/ReWP",
+	"require": {
+		"interconnectit/search-replace-db": "~3.0"
+	}
 }

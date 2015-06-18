@@ -61,7 +61,7 @@ directory File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home]) do
 end
 
 
-unless File.exist?(File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home], 'index.php'))
+unless File.exist?(File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_home], 'wp-load.php'))
   bash "wordpress-core-download" do
     user node[:wpcli][:user]
     group node[:wpcli][:group]

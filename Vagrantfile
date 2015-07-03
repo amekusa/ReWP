@@ -45,6 +45,9 @@ Vagrant.configure(2) do |config|
     exit 1
   end
 
+  config.vm.define _conf['hostname'] do |v|
+  end
+
   config.vm.box = ENV['wp_box'] || _conf['wp_box']
   config.ssh.forward_agent = true
 
@@ -65,6 +68,7 @@ Vagrant.configure(2) do |config|
   end
 
   config.vm.provider :virtualbox do |vb|
+    vb.name = _conf['hostname']
     vb.memory = _conf['memory'].to_i
     vb.cpus = _conf['cpus'].to_i
     if 1 < _conf['cpus'].to_i
@@ -160,6 +164,9 @@ Vagrant.configure(2) do |config|
           :url             => 'http://' << File.join(_conf['hostname'], _conf['wp_home']),
           :wpdir           => File.join(_conf['sync_folder_guest'], _conf['document_root'], _conf['wp_siteurl']),
           :dbhost          => _conf['db_host']
+        },
+        :phpenv => {
+          :php_version     => _conf['php_version']
         }
       },
       :rbenv => {

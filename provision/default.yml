@@ -16,8 +16,8 @@ cpus: 1
 #
 # Network Settings
 #
-hostname: wordpress.local
-hostname_old: wordpress.old.local
+hostname: vccw.dev
+hostname_old: vccw.old.dev
 ip: 192.168.33.10
 sync_folder: 'www/wordpress'
 sync_folder_guest: '/var/www/wordpress'
@@ -99,11 +99,19 @@ reset_db_on_provision: true
 #
 disable_vccw_cookbook: false
 
+
 #
 # User and Group
 #
 user: vagrant
 group: vagrant
+
+
+#
+# phpenv
+#
+php_version: default
+
 
 #
 # DB import

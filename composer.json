@@ -5,7 +5,7 @@
 			"email" : "post@amekusa.com"
 		}
 	],
-	"version" : "1.1.0",
+	"version" : "1.5.1",
 	"type" : "vagrant-provisioner",
 	"keywords" : [
 		"wordpress",
@@ -13,7 +13,7 @@
 	],
 	"license" : "MIT",
 	"minimum-stability" : "stable",
-	"description" : "A smart way to rebuild you WordPress site into local",
+	"description" : "A smart way to rebuild your WordPress site into the local machine",
 	"homepage" : "https://github.com/amekusa/ReWP",
 	"require": {
 		"interconnectit/search-replace-db": "~3.0"

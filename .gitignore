@@ -12,3 +12,4 @@ site.yml
 vendor
 www
 .project
+composer.phar

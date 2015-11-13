@@ -78,50 +78,50 @@ describe command("wget --no-check-certificate -q https://" + File.join($conf['ip
 end
 
 $conf['plugins'].each do |plugin|
-  describe file(File.join($conf['document_root'], $conf['wp_siteurl'], 'wp-content/plugins', plugin, 'readme.txt')) do
+  describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_siteurl'], 'wp-content/plugins', plugin, 'readme.txt')) do
     let(:disable_sudo) { true }
     it { should be_file }
     it { should be_owned_by $conf['user'] }
   end
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_home'])) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_home'])) do
     let(:disable_sudo) { true }
     it { should be_directory }
     it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_siteurl'])) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_siteurl'])) do
     let(:disable_sudo) { true }
     it { should be_directory }
     it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_home'], '.htaccess')) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_home'], '.htaccess')) do
   let(:disable_sudo) { true }
   it { should be_file }
   it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_home'], '.gitignore')) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_home'], '.gitignore')) do
     let(:disable_sudo) { true }
     it { should be_file }
     it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_home'], 'index.php')) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_home'], 'index.php')) do
   let(:disable_sudo) { true }
   it { should be_file }
   it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], $conf['wp_siteurl'], 'wp-load.php')) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], $conf['wp_siteurl'], 'wp-load.php')) do
   let(:disable_sudo) { true }
   it { should be_file }
   it { should be_owned_by $conf['user'] }
 end
 
-describe file(File.join($conf['document_root'], '.editorconfig')) do
+describe file(File.join($conf['sync_folder_guest'], $conf['document_root'], '.editorconfig')) do
   let(:disable_sudo) { true }
   it { should be_file }
   it { should be_owned_by $conf['user'] }

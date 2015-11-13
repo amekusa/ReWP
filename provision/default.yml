@@ -34,9 +34,9 @@ rewrite_structure: /archives/%post_id%
 #
 # WordPress Path
 #
-document_root: ''
-wp_siteurl: ''  # Path to the WP_SITEURL like "wp"
-wp_home: ''     # Path to the WP_HOME like "wp"
+document_root: '' # Path to document-root relative to sync_folder_guest
+wp_siteurl: ''    # Path to the WP_SITEURL like "wp"
+wp_home: ''       # Path to the WP_HOME like "wp"
 
 #
 # WordPress User

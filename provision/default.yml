@@ -126,4 +126,4 @@ import_wxr: false
 import_wxr_file: db.xml
 
 # Misc.
-overwrite_htaccess: false
+overwrite_htaccess: true # Set false if you want to preserve existing .htaccess in your project

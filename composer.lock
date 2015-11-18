@@ -1,10 +1,11 @@
 {
     "_readme": [
         "This file locks the dependencies of your project to a known state",
-        "Read more about it at http://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "95271a5ab06194ef132998157b9d29e9",
+    "hash": "43c6e7f4006458e45ad73d33739e60f0",
+    "content-hash": "654972313c1faaacb90be89cde5b7771",
     "packages": [
         {
             "name": "interconnectit/search-replace-db",

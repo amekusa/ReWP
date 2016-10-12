@@ -103,7 +103,7 @@ Vagrant.configure(2) do |config|
         :listen_ports => ['80', '443']
       },
       :php => {
-        :packages => %w(php php-cli php-devel php-mbstring php-gd php-xml php-mysql php-pecl-xdebug),
+        :packages => %w(php php-cli php-devel php-mbstring php-gd php-xml php-mysql php-pecl-xdebug php-mcrypt),
         :directives => {
             'default_charset'            => 'UTF-8',
             'mbstring.language'          => 'neutral',
@@ -154,6 +154,7 @@ Vagrant.configure(2) do |config|
         :dbuser            => _conf['db_user'],
         :dbpassword        => _conf['db_pass'],
         :options           => _conf['options'],
+        :multisite_options => _conf['multisite_options'],
         :rewrite_structure => _conf['rewrite_structure'],
         :overwrite_htaccess => _conf['overwrite_htaccess']
       },
@@ -178,19 +179,19 @@ Vagrant.configure(2) do |config|
           '2.1.2' => [
             {
               name: 'bundler',
-              options: '--no-ri --no-rdoc'
+              options: '--no-document'
             },
             {
               name: 'sass',
-              options: '--no-ri --no-rdoc'
+              options: '--no-document'
             },
             {
               name: 'wordmove',
-              options: '--no-ri --no-rdoc'
+              options: '--no-document'
             },
             {
               name: 'mailcatcher',
-              options: '--no-ri --no-rdoc'
+              options: '--no-document'
             }
           ]
         }

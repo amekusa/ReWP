@@ -67,6 +67,16 @@ describe command('~/.composer/vendor/bin/phpcs --version') do
   its(:exit_status) { should eq 0 }
 end
 
+describe command('~/.composer/vendor/bin/phpdoc --version') do
+  let(:disable_sudo) { true }
+  its(:exit_status) { should eq 0 }
+end
+
+describe command('~/.composer/vendor/bin/phpmd --version') do
+  let(:disable_sudo) { true }
+  its(:exit_status) { should eq 0 }
+end
+
 describe file('/vagrant/Movefile') do
   let(:disable_sudo) { true }
   it { should be_file }

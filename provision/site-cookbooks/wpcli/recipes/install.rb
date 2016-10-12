@@ -259,6 +259,15 @@ if node[:wpcli][:is_multisite] == true then
     mode "0644"
     action node[:wpcli][:overwrite_htaccess] ? :create : :create_if_missing
   end
+
+  node[:wpcli][:multisite_options].each do |key, value|
+    bash "Setting up Wordpress multisite option #{key}" do
+      user node[:wpcli][:user]
+      group node[:wpcli][:group]
+      cwd File.join(node[:wpcli][:wp_docroot], node[:wpcli][:wp_siteurl])
+      code "WP_CLI_CONFIG_PATH=#{Shellwords.shellescape(node[:wpcli][:config_path])} wp network meta update 1 #{Shellwords.shellescape(key.to_s)} #{Shellwords.shellescape(value.to_s)}"
+    end
+  end
 end
 
 

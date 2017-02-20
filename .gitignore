@@ -5,7 +5,9 @@ dist/
 .vagrant
 Movefile
 _site
+npm-debug.log
 package.box
+playbook.retry
 provision-post.sh
 provision-pre.sh
 site.yml

@@ -1,0 +1,132 @@
+- hosts: all
+  vars:
+    wp_cli_bin_url: https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+    # Required rubygems
+    # mailcatcher should be installed as root because it will run as daemon,
+    # so it shouldn't install here.
+    rubygems:
+      - bundler
+      - wordmove
+    # Required npms
+    npms:
+      - gulp-cli
+    # Required composer
+    composers:
+      - hirak/prestissimo:*
+      - phpunit/phpunit:*
+      - squizlabs/php_codesniffer:*
+      - wp-coding-standards/wpcs:*
+    wp_cli_packages:
+      - vccw/wp-cli-scaffold-movefile:@stable
+
+  tasks:
+
+    # Setup bash
+    - name: Place ~/.bash_profile
+      become: no
+      template:
+        src: templates/.bash_profile
+        dest: "{{ ansible_env.HOME }}/.bash_profile"
+    - name: Place ~/.bash.d/
+      become: no
+      file:
+        path: "{{ ansible_env.HOME }}/.bash.d"
+        state: directory
+    - name: Place ~/.bash.d/vccw.sh
+      become: no
+      template:
+        src: templates/vccw.sh
+        dest: "{{ ansible_env.HOME }}/.bash.d/vccw.sh"
+
+    # Install WP-CLI
+    - name: Install WP-CLI
+      become: yes
+      get_url:
+        url: "{{ wp_cli_bin_url }}"
+        dest: /usr/local/bin/wp
+        mode: 0755
+        force: yes
+    - name: Install WP-CLI packages
+      become: no
+      shell: /bin/bash -lc "wp package install '{{ item }}'"
+      with_items: "{{ wp_cli_packages | default([]) }}"
+    - name: Create ~/.wp-cli/
+      file:
+        path: "{{ ansible_env.HOME }}/.wp-cli/"
+        state: directory
+    - name: Create ~/.wp-cli/config.yml
+      template:
+        src: templates/config.yml
+        dest: "{{ ansible_env.HOME }}/.wp-cli/config.yml"
+
+    # Install Ruby gems
+    - name: Place ~/.gemrc
+      become: no
+      template:
+        src: templates/.gemrc
+        dest: "{{ ansible_env.HOME }}/.gemrc"
+    - name: Install Ruby gems
+      become: no
+      gem:
+        name: "{{ item }}"
+        state: latest
+        user_install: yes
+      with_items: "{{ rubygems }}"
+
+    # Install npm packages
+    - name: Place ~/.npmrc
+      become: no
+      template:
+        src: templates/.npmrc
+        dest: "{{ ansible_env.HOME }}/.npmrc"
+    - name: Install npm packages
+      become: no
+      npm:
+        name: "{{ item }}"
+        global: yes
+        executable: /usr/bin/npm
+      with_items: "{{ npms }}"
+
+    # Install Composer libraries
+    - name: Install Composer libraries
+      shell: /bin/bash -lc "composer global require '{{ item }}'"
+      with_items: "{{ composers }}"
+
+    # Setup WordPress coding standards
+    - name: Setup WordPress coding standard
+      shell: /bin/bash -lc "phpcs --config-set installed_paths {{ ansible_env.HOME }}/.composer/vendor/wp-coding-standards/wpcs"
+
+    # WordPress i18n tools
+    - name: Checkout WordPress i18n Tools
+      subversion:
+        repo: http://i18n.svn.wordpress.org/tools/trunk/
+        dest: "{{ ansible_env.HOME }}/.wp-i18n/"
+
+    # Install user's Ruby gems
+    - name: Install custom Ruby gems
+      become: no
+      gem:
+        name: "{{ item }}"
+        state: latest
+        user_install: yes
+      with_items: "{{ vccw.ruby_gems | default([]) }}"
+
+    # Install user's npms
+    - name: Install custom npm packages
+      become: no
+      npm:
+        name: "{{ item }}"
+        global: yes
+        executable: /usr/bin/npm
+      with_items: "{{ vccw.npms | default([]) }}"
+
+    # Install user's Composer libraries
+    - name: Install custom Composer libraries
+      shell: /bin/bash -lc "composer global require '{{ item }}'"
+      with_items: "{{ vccw.composers | default([]) }}"
+
+    # Install user's wp-cli packages
+    - name: Install custom WP-CLI packages
+      become: no
+      shell: /bin/bash -lc "wp package install '{{ item }}'"
+      with_items: "{{ vccw.wp_cli_packages | default([]) }}"

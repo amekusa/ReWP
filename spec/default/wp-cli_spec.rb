@@ -8,15 +8,15 @@ describe host($conf['hostname']) do
   it { should be_resolvable.by('hosts') }
 end
 
-describe interface('eth1') do
+describe interface('enp0s8') do
   it { should have_ipv4_address($conf['ip']) }
 end
 
-describe package('httpd') do
+describe package('apache2') do
   it { should be_installed }
 end
 
-describe service('httpd') do
+describe service('apache2') do
   it { should be_enabled }
   it { should be_running }
 end
@@ -30,37 +30,33 @@ describe port(443) do
 end
 
 describe 'PHP config parameters' do
-  context  php_config('default_charset') do
+  context php_config('default_charset', :ini => '/etc/php/7.0/apache2/php.ini') do
     its(:value) { should eq 'UTF-8' }
   end
 
-  context  php_config('mbstring.language') do
+  context  php_config('mbstring.language', :ini => '/etc/php/7.0/apache2/php.ini') do
     its(:value) { should eq 'neutral' }
   end
 
-  context  php_config('mbstring.internal_encoding') do
+  context  php_config('mbstring.internal_encoding', :ini => '/etc/php/7.0/apache2/php.ini') do
     its(:value) { should eq 'UTF-8' }
   end
 
-  context php_config('date.timezone') do
+  context php_config('date.timezone', :ini => '/etc/php/7.0/apache2/php.ini') do
     its(:value) { should eq 'UTC' }
   end
 
-  context php_config('short_open_tag') do
-    its(:value) { should eq 'Off' }
+  context php_config('short_open_tag', :ini => '/etc/php/7.0/apache2/php.ini') do
+    its(:value) { should_not eq 1 }
+    its(:value) { should_not eq 'On' }
   end
 
-  context php_config('session.save_path') do
+  context php_config('session.save_path', :ini => '/etc/php/7.0/apache2/php.ini') do
     its(:value) { should eq '/tmp' }
   end
 end
 
 describe command('wp --version') do
-  let(:disable_sudo) { true }
-  its(:exit_status) { should eq 0 }
-end
-
-describe command('wp help dictator') do
   let(:disable_sudo) { true }
   its(:exit_status) { should eq 0 }
 end

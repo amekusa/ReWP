@@ -1,0 +1,168 @@
+- hosts: all
+  vars:
+    path: "{{ vccw.document_root }}/{{ vccw.wp_siteurl }}"
+    dbname: "wordpress"
+    dbuser: "wordpress"
+    dbpassword: "wordpress"
+
+  tasks:
+
+  # Database Settings
+  - name: Create Database
+    mysql_db:
+      login_user: root
+      login_password: wordpress
+      name: "{{ dbname }}"
+      state: present
+  - name: Create MySQL user
+    mysql_user:
+      login_user: root
+      login_password: wordpress
+      name: "{{ dbuser }}"
+      password: "{{ dbpassword }}"
+      priv: "wordpress.*:ALL"
+      host: "%"
+      state: present
+
+  # download wordpress
+  - name: Run `wp core download`
+    command: |
+      wp core download
+      --path={{ path }}
+      --locale={{ vccw.lang }}
+      --version={{ vccw.version }}
+      --force
+
+  # wp-config.php
+  - name: Delete wp-config.php
+    file:
+      state: absent
+      path: "{{ path }}/wp-config.php"
+  - name: Create temporary file for extra-php in wp-config.php
+    template:
+      src: templates/extra-php.txt
+      dest: "{{ path }}/extra-php.txt"
+  - name: Run `wp core config`
+    shell: |
+       wp core config \
+       --path={{ path }} \
+       --dbhost={{ vccw.db_host }} \
+       --dbname={{ dbname }} \
+       --dbuser={{ dbuser }} \
+       --dbpass={{ dbpassword }} \
+       --dbprefix={{ vccw.db_prefix }} \
+       --locale={{ vccw.lang }} \
+       --extra-php < {{ path | realpath }}/extra-php.txt
+  - name: Delete temporary file
+    file:
+      state: absent
+      path: "{{ path }}/extra-php.txt"
+
+  # Reset Database
+  - name: Run `wp db reset`
+    command: wp db reset --yes --path={{ path }}
+    when: vccw.reset_db_on_provision
+
+  # install wordpress
+  - name: Run `wp core install`
+    command: |
+      wp core install
+      --path={{ path }}
+      --url=http://{{ vccw.hostname }}/{{ vccw.wp_siteurl }}
+      --title='{{ vccw.title }}'
+      --admin_user={{ vccw.admin_user }}
+      --admin_password={{ vccw.admin_pass }}
+      --admin_email={{ vccw.admin_email }}
+
+  - name: Create index.php for wp_siteurl
+    when: vccw.wp_siteurl != ''
+    template:
+      src: templates/index.php
+      dest: "{{ vccw.document_root }}/index.php"
+
+  - name: Create `.editorconfig`
+    template:
+      src: templates/editorconfig
+      dest: "{{ vccw.document_root }}/.editorconfig"
+
+  - name: Create `.gitignore`
+    template:
+      src: templates/gitignore
+      dest: "{{ vccw.document_root }}/.gitignore"
+
+  # Install Plugins
+  - name: Run `wp plugin install`
+    command: |
+      wp plugin install {{ item }}
+      --activate
+      --path={{ path }}
+    with_items: "{{ vccw.plugins | default([]) }}"
+
+  # Install Theme
+  - name: Run `wp theme install`
+    command: |
+      wp theme install {{ vccw.theme }}
+      --path={{ path }}
+    when: vccw.theme != ''
+
+  # Import Theme Unit Test Data
+  - name: Run `wp plugin install wordpress-importer`
+    command: |
+      wp plugin install wordpress-importer
+      --activate
+      --path={{ path }}
+  - name: Download WordPress theme unit test data
+    when: vccw.theme_unit_test
+    get_url:
+      url: "{{ vccw.theme_unit_test_uri }}"
+      dest: "{{ theme_unit_test_data }}"
+  - name: Import WordPress theme unit test data
+    when: vccw.theme_unit_test
+    command: |
+      wp import
+      --authors=create {{ theme_unit_test_data }}
+      --path={{ path }}
+
+  # Import Options
+  - name: Run `wp options update`
+    command: |
+      wp option update {{ item.key }} '{{ item.value }}'
+      --path={{ path }}
+    with_dict: "{{ vccw.options }}"
+
+  # Setting Permalink
+  - name: Run `wp rewrite structure`
+    command: |
+      wp rewrite structure {{ vccw.rewrite_structure }}
+      --path={{ path }}
+  - name: Flush rewrite rules
+    command: |
+      wp rewrite flush
+      --hard
+      --path={{ path }}
+
+ # multisite Settings
+  - name: Run `wp core multisite-convert`
+    when: vccw.multisite
+    command: |
+      wp core multisite-convert
+      --path={{ path }}
+  - name: Create `.htaccess` for multisite
+    when: vccw.multisite
+    template:
+      src: templates/multisite-htaccess
+      dest: "{{ vccw.document_root }}/.htaccess"
+  - name: Setting up Wordpress multisite options
+    command: |
+      wp network meta update 1 {{ item.key }} '{{ item.value }}'
+      --path={{ path }}
+    with_dict: "{{ vccw.multisite_options | default({}) }}"
+    when: vccw.multisite
+
+  # Generate Movefile
+  - name: Create a Movefile
+    become: no
+    shell: /bin/bash -lc "wp scaffold movefile"
+    args:
+      chdir: "{{ vccw.vagrant_dir }}"
+      creates: Movefile
